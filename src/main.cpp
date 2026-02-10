@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #define STB_IMAGE_IMPLEMENTATION
 #include <STB/stb_image.h>
 
@@ -8,6 +9,9 @@
 #include <GLM/gtc/type_ptr.hpp>
 #include "DeltaTime.hpp"
 #include <vector>
+
+#include <GLM/gtx/euler_angles.hpp>
+
 
 
 const char* vSource = R"(
@@ -108,15 +112,71 @@ float verticesCubeSigma[] = {
 
 
 
+float coinVertices[] = {
+
+     0.00f,  0.00f,  0.05f,      0.50f, 0.50f,      0.0f, 0.0f, 1.0f, // Центр (0)
+     0.00f,  0.50f,  0.05f,      0.50f, 1.00f,      0.0f, 0.0f, 1.0f, // 1
+     0.25f,  0.43f,  0.05f,      0.75f, 0.93f,      0.0f, 0.0f, 1.0f, // 2
+     0.43f,  0.25f,  0.05f,      0.93f, 0.75f,      0.0f, 0.0f, 1.0f, // 3
+     0.50f,  0.00f,  0.05f,      1.00f, 0.50f,      0.0f, 0.0f, 1.0f, // 4
+     0.43f, -0.25f,  0.05f,      0.93f, 0.25f,      0.0f, 0.0f, 1.0f, // 5
+     0.25f, -0.43f,  0.05f,      0.75f, 0.07f,      0.0f, 0.0f, 1.0f, // 6
+     0.00f, -0.50f,  0.05f,      0.50f, 0.00f,      0.0f, 0.0f, 1.0f, // 7
+    -0.25f, -0.43f,  0.05f,      0.25f, 0.07f,      0.0f, 0.0f, 1.0f, // 8
+    -0.43f, -0.25f,  0.05f,      0.07f, 0.25f,      0.0f, 0.0f, 1.0f, // 9
+    -0.50f,  0.00f,  0.05f,      0.00f, 0.50f,      0.0f, 0.0f, 1.0f, // 10
+    -0.43f,  0.25f,  0.05f,      0.07f, 0.75f,      0.0f, 0.0f, 1.0f, // 11
+    -0.25f,  0.43f,  0.05f,      0.25f, 0.93f,      0.0f, 0.0f, 1.0f, // 12
+
+
+     0.00f,  0.00f, -0.05f,      0.50f, 0.50f,      0.0f, 0.0f, -1.0f,
+     0.00f,  0.50f, -0.05f,      0.50f, 1.00f,      0.0f, 0.0f, -1.0f,
+     0.25f,  0.43f, -0.05f,      0.75f, 0.93f,      0.0f, 0.0f, -1.0f,
+     0.43f,  0.25f, -0.05f,      0.93f, 0.75f,      0.0f, 0.0f, -1.0f,
+     0.50f,  0.00f, -0.05f,      1.00f, 0.50f,      0.0f, 0.0f, -1.0f,
+     0.43f, -0.25f, -0.05f,      0.93f, 0.25f,      0.0f, 0.0f, -1.0f,
+     0.25f, -0.43f, -0.05f,      0.75f, 0.07f,      0.0f, 0.0f, -1.0f,
+     0.00f, -0.50f, -0.05f,      0.50f, 0.00f,      0.0f, 0.0f, -1.0f,
+    -0.25f, -0.43f, -0.05f,      0.25f, 0.07f,      0.0f, 0.0f, -1.0f,
+    -0.43f, -0.25f, -0.05f,      0.07f, 0.25f,      0.0f, 0.0f, -1.0f,
+    -0.50f,  0.00f, -0.05f,      0.00f, 0.50f,      0.0f, 0.0f, -1.0f,
+    -0.43f,  0.25f, -0.05f,      0.07f, 0.75f,      0.0f, 0.0f, -1.0f,
+    -0.25f,  0.43f, -0.05f,      0.25f, 0.93f,      0.0f, 0.0f, -1.0f
+};
+
+unsigned int coinIndices[] = {
+   
+    0, 1, 2,  0, 2, 3,  0, 3, 4,  0, 4, 5,  0, 5, 6,  0, 6, 7,
+    0, 7, 8,  0, 8, 9,  0, 9, 10, 0, 10, 11, 0, 11, 12, 0, 12, 1,
+    
+    13, 15, 14, 13, 16, 15, 13, 17, 16, 13, 18, 17, 13, 19, 18, 13, 20, 19,
+    13, 21, 20, 13, 22, 21, 13, 23, 22, 13, 24, 23, 13, 25, 24, 13, 14, 25,
+    
+    1, 14, 15, 1, 15, 2,   2, 15, 16, 2, 16, 3,   3, 16, 17, 3, 17, 4,
+    4, 17, 18, 4, 18, 5,   5, 18, 19, 5, 19, 6,   6, 19, 20, 6, 20, 7,
+    7, 20, 21, 7, 21, 8,   8, 21, 22, 8, 22, 9,   9, 22, 23, 9, 23, 10,
+    10, 23, 24, 10, 24, 11, 11, 24, 25, 11, 25, 12, 12, 25, 14, 12, 14, 1
+};
+
+
+
+
+
+
+
+
+
+
+
 
 
 unsigned int indices[] = {
-    0, 1, 2, 2, 3, 0,    
-    4, 5, 6, 6, 7, 4,      
-    8, 9, 10, 10, 11, 8,   
-    12, 13, 14, 14, 15, 12, 
-    16, 17, 18, 18, 19, 16, 
-    20, 21, 22, 22, 23, 20  
+    0, 1, 2, 2, 3, 0,
+    4, 5, 6, 6, 7, 4,
+    8, 9, 10, 10, 11, 8,
+    12, 13, 14, 14, 15, 12,
+    16, 17, 18, 18, 19, 16,
+    20, 21, 22, 22, 23, 20
 };
 
 
@@ -125,6 +185,19 @@ struct BoxCollider {
     glm::vec3 size;
     bool isStatic;
 };
+
+struct PlayerCollider {
+    glm::vec3* pos;
+    glm::vec3 size;
+};
+
+struct HardBoxCollider {
+    glm::vec3 pos;
+    glm::mat4 rotMat;
+    glm::vec3 size;
+    bool isStatic;
+};
+
 
 
 
@@ -156,6 +229,43 @@ void resolveCollision(const BoxCollider& wall, BoxCollider& player, bool& ground
         }
     }
 }
+
+
+
+void resolveQuakeCollision(const HardBoxCollider& wall, PlayerCollider& player, bool& grounded) {
+    glm::vec3 axes[3];
+    axes[0] = glm::vec3(wall.rotMat[0]);
+    axes[1] = glm::vec3(wall.rotMat[1]);
+    axes[2] = glm::vec3(wall.rotMat[2]);
+
+    glm::vec3 delta = *player.pos - wall.pos;
+
+    float minOverlap = 10000.0f; // :)
+    glm::vec3 bestNormal(0.0f);
+
+    for (int i = 0; i < 3; i++) {
+        float dist = glm::dot(delta, axes[i]);
+        
+        float combinedSize = (wall.size[i] + player.size[i]) * 0.5f;
+        
+        float overlap = combinedSize - glm::abs(dist);
+
+        if (overlap <= 0.0f) return;
+
+        if (overlap < minOverlap) {
+            minOverlap = overlap;
+            bestNormal = (dist > 0.0f) ? axes[i] : -axes[i];
+        }
+    }
+
+    *player.pos += bestNormal * minOverlap;
+
+    if (glm::dot(bestNormal, glm::vec3(0, 1, 0)) > 0.5f) {
+        grounded = true;
+    }
+}
+
+
 
 
 
@@ -198,6 +308,39 @@ int main(){
     glEnableVertexAttribArray(2);
 
 
+  //монетка такая уоуоуоу ahahaaasduhaudsahhuAHSHAUSHUAHSUASHAs
+    unsigned int VBO2, VAO2, EBO2;
+    glGenVertexArrays(1, &VAO2);
+    glGenBuffers(1, &VBO2);
+    glGenBuffers(1, &EBO2);
+
+    glBindVertexArray(VAO2);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(coinVertices), coinVertices, GL_STATIC_DRAW);
+
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO2);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(coinIndices), coinIndices, GL_STATIC_DRAW);
+
+
+
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+
+
+
+
+
+
     unsigned int texture1;
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
@@ -217,31 +360,94 @@ int main(){
     stbi_image_free(data);
 
 
+    unsigned int texture2;
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    data = stbi_load("images.jpg", &width, &height, &nrChannels, 0);
+    if (data) {
+        GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    stbi_image_free(data);
+
+
+
 
     glEnable(GL_DEPTH_TEST); 
 
 
     glm::vec3 cubePosition = glm::vec3(3.0f,0.0f,-3.0f);
-    glm::vec3 cubePosition2 = glm::vec3(0.0f,2.0f,0.0f);
+    glm::vec3 cubePosition2 = glm::vec3(0.0f,4.0f,0.0f);
+
+    glm::vec3 cubePosition3 = glm::vec3(53.0f,9.0f,-3.0f);
+    
+
+    glm::vec3 cubePosition4 = glm::vec3(-40.0f,9.0f,-3.0f);
+
+
+    glm::vec3 cubePosition5 = glm::vec3(10.0f,9.0f,-50.0f);
+
+
+    glm::vec3 cubePosition6 = glm::vec3(10.0f,9.0f,40.0f);
+
+
+
+    glm::vec3 ispiTaniePos = glm::vec3(15.0f,6.0f,0.0f);
 
 
     glm::vec3 cubeScale = glm::vec3(100.0f,1.0f,100.0f);
     glm::vec3 cube2Scale = glm::vec3(1.0f,4.0f,1.0f);
-    float gravity = 15.0f;
+    glm::vec3 cube3Scale = glm::vec3(1.0f,100.0f,100.0f);
+    glm::vec3 cube4Scale = glm::vec3(100.0f,100.0f,1.0f);
+
+
+    glm::vec3 ispiTanieScale = glm::vec3(100.0f,2.0f,10.0f);
+
+    glm::vec3 CoinScale = glm::vec3(10.0f,10.0f,10.0f);
+
+    glm::mat4 rampaRot = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f), glm::vec3(0, 0, 1));
+
+
+    float gravity = 20.0f;
 
 
 
-    float speed = 10.0f;
+    float speed = 30.0f;
 
     double mouseX, mouseY;
     static double lastX = 400.0, lastY = 300.0;
 
 
+    
+    
+    //дефолтные и простые такие колизии
+    std::vector<HardBoxCollider> worldColliders;
+    glm::mat4 noRot = glm::mat4(1.0f); 
+    worldColliders.push_back({cubePosition,noRot, cubeScale, true }); 
+    worldColliders.push_back({cubePosition3,noRot,cube3Scale, true });
+    worldColliders.push_back({cubePosition4, noRot,cube3Scale, true });
+    worldColliders.push_back({cubePosition5, noRot,cube4Scale, true });
+    worldColliders.push_back({cubePosition6, noRot,cube4Scale, true });
+    worldColliders.push_back({ispiTaniePos,rampaRot,ispiTanieScale, true });
+
+    //очень крутые колизии такие вов
+
+    std::vector<HardBoxCollider> world;
+
+// Создаем рампу один раз
+    glm::mat4 rMat = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f), glm::vec3(0, 0, 1));
+    world.push_back({ glm::vec3(5, 0, 0), rMat, glm::vec3(10, 1, 10), true });
+
+    PlayerCollider pColl = { &cubePosition2, cube2Scale};
 
 
-    std::vector<BoxCollider> worldColliders;
-    worldColliders.push_back({ &cubePosition, cubeScale, true }); 
-    BoxCollider playerColl = { &cubePosition2, cube2Scale, false };
+
+
+    
 
 
 
@@ -253,12 +459,61 @@ int main(){
     float pitch = 0.0f;
     glm::vec3 cs = glm::vec3(0.0f, 2.0f, 0.0f); 
     float velY = 0.0f;
+
+
+
+
+
+
+    glm::mat4 model2 = glm::mat4(1.0f);
+    model2 = glm::translate(model2,cubePosition3);
+    model2 = glm::scale(model2,cube3Scale);
+
+    glm::mat4 model3 = glm::mat4(1.0f);
+    model3 = glm::translate(model3,cubePosition4);
+    model3 = glm::scale(model3,cube3Scale);
+
+
+    glm::mat4 model4 = glm::mat4(1.0f);
+    model4 = glm::translate(model4,cubePosition5);
+    model4 = glm::scale(model4,cube4Scale);
+
+
+    glm::mat4 model5 = glm::mat4(1.0f);
+    model5 = glm::translate(model5,cubePosition6);
+    model5 = glm::scale(model5,cube4Scale);
+
+
+    glm::mat4 model6 = glm::mat4(1.0f);
+    model6 = glm::translate(model6,ispiTaniePos);
+    
+    model6 = model6 * rMat; 
+
+
+    model6 = glm::scale(model6,ispiTanieScale);
+
+
+
+
+
+    glm::mat4 coin = glm::mat4(1.0f);
+    coin = glm::translate(coin,glm::vec3(0.0f,12.0f,0.0f));
+    coin = glm::rotate(coin, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    coin = glm::scale(coin,CoinScale);
+
+
+
+
+
+
+
+
     glfwSetInputMode(w1.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     while (!glfwWindowShouldClose(w1.window)) {
         Time::update();
 
         
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.2f, 0.3f, 0.7f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -321,14 +576,17 @@ int main(){
 
         bool isGrounded = false; 
         for (auto& wall : worldColliders) {
-            resolveCollision(wall, playerColl, isGrounded);
+            resolveQuakeCollision(wall, pColl, isGrounded);
         }
 
+
+
+
         if (isGrounded) {
-            if (velY < 0) velY = 0; 
+            if (velY < 0) velY = 0;
 
             if (glfwGetKey(w1.window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-                velY = 7.0f;
+                velY = 9.0f;
             }
         }
         
@@ -338,7 +596,7 @@ int main(){
         
         
 
-        glm::mat4 projection = glm::perspective(glm::radians(70.0f), 800.0f/600.0f, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(70.0f), 800.0f/600.0f, 0.1f, 1000.0f);
         glm::mat4 view = glm::lookAt(cameraPos,cameraPos + cameraFront,cameraUp);
         
         
@@ -348,23 +606,50 @@ int main(){
         
         glBindVertexArray(VAO);
         glActiveTexture(GL_TEXTURE0); // Активируем слот 0
-        glBindTexture(GL_TEXTURE_2D, texture1);
-
-
-
         
-
+        
+        
+        
+        
+        glBindTexture(GL_TEXTURE_2D, texture1);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cubePosition);
         model = glm::scale(model, cubeScale);
         prog.setMat4("model", model);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); 
         
-        
-        
-        
-        
-        
+
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        prog.setMat4("model", model2);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); 
+
+
+
+        prog.setMat4("model", model3);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); 
+
+
+        prog.setMat4("model", model4);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+
+        prog.setMat4("model", model5);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+
+        prog.setMat4("model", model6);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+
+
+        glBindVertexArray(VAO2); 
+        prog.setMat4("model",coin);
+        glDrawElements(GL_TRIANGLES, sizeof(coinIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+
+
+
+
+
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindVertexArray(0);
         glfwSwapBuffers(w1.window);
