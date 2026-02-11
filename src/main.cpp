@@ -10,8 +10,6 @@
 #include "DeltaTime.hpp"
 #include <vector>
 
-#include <GLM/gtx/euler_angles.hpp>
-
 
 
 const char* vSource = R"(
@@ -56,7 +54,7 @@ const char* fSource = R"(
     uniform vec3 viewPos;
     
     void main() {
-        float ambientStrength = 0.2;
+        float ambientStrength = 0.5;
         vec3 ambient = ambientStrength * lightColor;
               
         vec3 norm = normalize(Normal);
@@ -70,6 +68,8 @@ const char* fSource = R"(
     }
 
 )";
+
+
 
 
 
@@ -114,19 +114,19 @@ float verticesCubeSigma[] = {
 
 float coinVertices[] = {
 
-     0.00f,  0.00f,  0.05f,      0.50f, 0.50f,      0.0f, 0.0f, 1.0f, // Центр (0)
-     0.00f,  0.50f,  0.05f,      0.50f, 1.00f,      0.0f, 0.0f, 1.0f, // 1
-     0.25f,  0.43f,  0.05f,      0.75f, 0.93f,      0.0f, 0.0f, 1.0f, // 2
-     0.43f,  0.25f,  0.05f,      0.93f, 0.75f,      0.0f, 0.0f, 1.0f, // 3
-     0.50f,  0.00f,  0.05f,      1.00f, 0.50f,      0.0f, 0.0f, 1.0f, // 4
-     0.43f, -0.25f,  0.05f,      0.93f, 0.25f,      0.0f, 0.0f, 1.0f, // 5
-     0.25f, -0.43f,  0.05f,      0.75f, 0.07f,      0.0f, 0.0f, 1.0f, // 6
-     0.00f, -0.50f,  0.05f,      0.50f, 0.00f,      0.0f, 0.0f, 1.0f, // 7
-    -0.25f, -0.43f,  0.05f,      0.25f, 0.07f,      0.0f, 0.0f, 1.0f, // 8
-    -0.43f, -0.25f,  0.05f,      0.07f, 0.25f,      0.0f, 0.0f, 1.0f, // 9
-    -0.50f,  0.00f,  0.05f,      0.00f, 0.50f,      0.0f, 0.0f, 1.0f, // 10
-    -0.43f,  0.25f,  0.05f,      0.07f, 0.75f,      0.0f, 0.0f, 1.0f, // 11
-    -0.25f,  0.43f,  0.05f,      0.25f, 0.93f,      0.0f, 0.0f, 1.0f, // 12
+     0.00f,  0.00f,  0.05f,      0.50f, 0.50f,      0.0f, 0.0f, 1.0f, 
+     0.00f,  0.50f,  0.05f,      0.50f, 1.00f,      0.0f, 0.0f, 1.0f, 
+     0.25f,  0.43f,  0.05f,      0.75f, 0.93f,      0.0f, 0.0f, 1.0f, 
+     0.43f,  0.25f,  0.05f,      0.93f, 0.75f,      0.0f, 0.0f, 1.0f, 
+     0.50f,  0.00f,  0.05f,      1.00f, 0.50f,      0.0f, 0.0f, 1.0f,
+     0.43f, -0.25f,  0.05f,      0.93f, 0.25f,      0.0f, 0.0f, 1.0f,
+     0.25f, -0.43f,  0.05f,      0.75f, 0.07f,      0.0f, 0.0f, 1.0f,
+     0.00f, -0.50f,  0.05f,      0.50f, 0.00f,      0.0f, 0.0f, 1.0f,
+    -0.25f, -0.43f,  0.05f,      0.25f, 0.07f,      0.0f, 0.0f, 1.0f,
+    -0.43f, -0.25f,  0.05f,      0.07f, 0.25f,      0.0f, 0.0f, 1.0f,
+    -0.50f,  0.00f,  0.05f,      0.00f, 0.50f,      0.0f, 0.0f, 1.0f,
+    -0.43f,  0.25f,  0.05f,      0.07f, 0.75f,      0.0f, 0.0f, 1.0f,
+    -0.25f,  0.43f,  0.05f,      0.25f, 0.93f,      0.0f, 0.0f, 1.0f, 
 
 
      0.00f,  0.00f, -0.05f,      0.50f, 0.50f,      0.0f, 0.0f, -1.0f,
@@ -376,6 +376,21 @@ int main(){
 
 
 
+    unsigned int texture3;
+    glGenTextures(1, &texture3);
+    glBindTexture(GL_TEXTURE_2D, texture3);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    data = stbi_load("med.jpg", &width, &height, &nrChannels, 0);
+    if (data) {
+        GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    stbi_image_free(data);
+
+
 
     glEnable(GL_DEPTH_TEST); 
 
@@ -407,16 +422,27 @@ int main(){
 
     glm::vec3 ispiTanieScale = glm::vec3(100.0f,2.0f,10.0f);
 
+    
     glm::vec3 CoinScale = glm::vec3(10.0f,10.0f,10.0f);
+    glm::vec3 CoinPosition = glm::vec3(45.0f,25.0f,30.0f);
+    glm::vec3 CoinPosition2 = glm::vec3(15.0f,25.0f,30.0f);
+    glm::vec3 CoinFScale = glm::vec3(11.0f,11.0f,23.0f);
+
+
 
     glm::mat4 rampaRot = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f), glm::vec3(0, 0, 1));
 
 
-    float gravity = 20.0f;
+    float gravity = 30.0f;
 
 
 
     float speed = 30.0f;
+
+
+    float tryaskaSpeed = 1.0f;
+    float amplitude = 0.6f;
+
 
     double mouseX, mouseY;
     static double lastX = 400.0, lastY = 300.0;
@@ -424,7 +450,6 @@ int main(){
 
     
     
-    //дефолтные и простые такие колизии
     std::vector<HardBoxCollider> worldColliders;
     glm::mat4 noRot = glm::mat4(1.0f); 
     worldColliders.push_back({cubePosition,noRot, cubeScale, true }); 
@@ -432,14 +457,20 @@ int main(){
     worldColliders.push_back({cubePosition4, noRot,cube3Scale, true });
     worldColliders.push_back({cubePosition5, noRot,cube4Scale, true });
     worldColliders.push_back({cubePosition6, noRot,cube4Scale, true });
+    worldColliders.push_back({CoinPosition, noRot,CoinScale, true });
+
+    worldColliders.push_back({CoinPosition2, noRot,CoinScale, true });
+
+
+
     worldColliders.push_back({ispiTaniePos,rampaRot,ispiTanieScale, true });
 
-    //очень крутые колизии такие вов
 
     std::vector<HardBoxCollider> world;
 
-// Создаем рампу один раз
     glm::mat4 rMat = glm::rotate(glm::mat4(1.0f), glm::radians(30.0f), glm::vec3(0, 0, 1));
+    glm::mat4 rMatCoin = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
+
     world.push_back({ glm::vec3(5, 0, 0), rMat, glm::vec3(10, 1, 10), true });
 
     PlayerCollider pColl = { &cubePosition2, cube2Scale};
@@ -497,12 +528,15 @@ int main(){
 
 
     glm::mat4 coin = glm::mat4(1.0f);
-    coin = glm::translate(coin,glm::vec3(0.0f,12.0f,0.0f));
+    coin = glm::translate(coin,CoinPosition);
     coin = glm::rotate(coin, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    coin = glm::scale(coin,CoinScale);
+    coin = glm::scale(coin,CoinFScale);
 
 
-
+    glm::mat4 coin2 = glm::mat4(1.0f);
+    coin2 = glm::translate(coin2,CoinPosition2);
+    coin2 = glm::rotate(coin2, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    coin2 = glm::scale(coin2,CoinFScale);
 
 
 
@@ -517,15 +551,16 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-        
-        cameraPos = cubePosition2 + cs; 
+        float time = (float)glfwGetTime();
+        float sway = sin(time * tryaskaSpeed) * amplitude;
+        cameraPos = cubePosition2 + cs + glm::vec3(0.0f, sway, 0.0f);  
 
 
         prog.use();
         glUniform1i(glGetUniformLocation(prog.ID, "ourTexture"), 0); 
-        glm::vec3 lightPos(1.2f, 10.0f, 2.0f); 
+        glm::vec3 lightPos(0.0f, 10.0f, 0.0f); 
         prog.setVec3("lightPos", lightPos);
-        prog.setVec3("lightColor", glm::vec3(0.4f, 0.4f, 0.4f));
+        prog.setVec3("lightColor", glm::vec3(0.7f, 0.7f, 1.0f));
 
 
 
@@ -564,11 +599,30 @@ int main(){
         glm::vec3 right = glm::normalize(glm::cross(forward, cameraUp));
         
         
-        if (glfwGetKey(w1.window, GLFW_KEY_W) == GLFW_PRESS) cubePosition2 += forward * cameraSpeed;
-        if (glfwGetKey(w1.window, GLFW_KEY_S) == GLFW_PRESS) cubePosition2 -= forward * cameraSpeed;
-        if (glfwGetKey(w1.window, GLFW_KEY_A) == GLFW_PRESS) cubePosition2 -= right * cameraSpeed;
-        if (glfwGetKey(w1.window, GLFW_KEY_D) == GLFW_PRESS) cubePosition2 += right * cameraSpeed;
-        
+        if (glfwGetKey(w1.window, GLFW_KEY_W) == GLFW_PRESS){
+            cubePosition2 += forward * cameraSpeed;
+            tryaskaSpeed = 10.0f;
+        }
+        else if (glfwGetKey(w1.window, GLFW_KEY_S) == GLFW_PRESS){
+            cubePosition2 -= forward * cameraSpeed;
+            tryaskaSpeed = 10.0f;
+
+        } else{
+            tryaskaSpeed = 1.0f;
+        }
+
+
+
+
+        if (glfwGetKey(w1.window, GLFW_KEY_A) == GLFW_PRESS){
+            cubePosition2 -= right * cameraSpeed;
+            tryaskaSpeed = 10.0f;
+
+        }
+        if (glfwGetKey(w1.window, GLFW_KEY_D) == GLFW_PRESS){
+            cubePosition2 += right * cameraSpeed;
+            tryaskaSpeed = 10.0f;
+        } 
 
         
         velY -= gravity * Time::deltaTime; 
@@ -586,7 +640,7 @@ int main(){
             if (velY < 0) velY = 0;
 
             if (glfwGetKey(w1.window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-                velY = 9.0f;
+                velY = 15.0f;
             }
         }
         
@@ -642,12 +696,14 @@ int main(){
 
 
 
-        glBindVertexArray(VAO2); 
+        glBindVertexArray(VAO2);
         prog.setMat4("model",coin);
         glDrawElements(GL_TRIANGLES, sizeof(coinIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
 
 
+        prog.setMat4("model",coin2);
+        glDrawElements(GL_TRIANGLES, sizeof(coinIndices)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
 
         glBindTexture(GL_TEXTURE_2D, 0);
