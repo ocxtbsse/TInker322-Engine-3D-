@@ -137,7 +137,7 @@ int meshLoadUlta(GameObject& targetObj,char* modelName){
 
     
     targetObj.mesh.VAOTM = VAO3;
-    targetObj.mesh.indicesSize = static_cast<unsigned int>(modelLoad.indices.size()); // Наш козырь!
+    targetObj.mesh.indicesSize = static_cast<unsigned int>(modelLoad.indices.size());
     targetObj.mesh.modelName = modelName;
     std::cout << "[DEBUG] VAO generated: " << VAO3 << " | indicesSize: " << targetObj.mesh.indicesSize << std::endl;
     
