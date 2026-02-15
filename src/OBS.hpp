@@ -28,6 +28,18 @@ struct GameObject{
         unsigned int VAOTM;
         unsigned int indicesSize;
     } mesh;
+
+
+
+    struct Material{
+        char* textureName;
+        unsigned int textureID;
+    } material;
+
+
+    struct Collider{//скоро
+
+    } collider;
 };
 
 
