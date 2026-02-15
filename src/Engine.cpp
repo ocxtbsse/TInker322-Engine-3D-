@@ -14,12 +14,12 @@
 #include <GLM/gtc/type_ptr.hpp>
 #include <math.h>
 
-
+// fixed bug
 const char* vSource = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
-    layout (location = 1) in vec2 aTexCoord;
-    layout (location = 2) in vec3 aNormal;
+    layout (location = 1) in vec3 aNormal;
+    layout (location = 2) in vec2 aTexCoord;
 
 
     out vec2 TexCoord;
@@ -79,8 +79,6 @@ const char* fSource = R"(
 
 Window w1;
 ShaderProgram prog;
-std::vector<unsigned int> VAOLoad;
-unsigned int TextureID;
 
 
 
@@ -179,7 +177,6 @@ int init(){
     if (prog.compileShader(vSource, fSource) != 0) return -2;
 
 
-    TextureID = textureLoad("wall.jpg");
 
     glfwSetInputMode(w1.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -214,10 +211,10 @@ int render(){
 
 
     
-    glBindTexture(GL_TEXTURE_2D, TextureID);
-
-
+    
+    
     for(auto& obj : sceneObjects){
+        glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
         glBindVertexArray(obj.mesh.VAOTM);
         prog.setMat4("model", obj.getModelMatrix());
         glDrawElements(GL_TRIANGLES, obj.mesh.indicesSize, GL_UNSIGNED_INT, 0);
@@ -302,8 +299,5 @@ int update(){
 
 
     float time = (float)glfwGetTime();
-     //Ignati lapkin mode
-    obj.rotation.x += sin(time);
-    obj2.rotation.x += sin(time-0.5f);
     return 0;
 }
