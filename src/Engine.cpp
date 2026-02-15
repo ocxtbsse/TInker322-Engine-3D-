@@ -298,6 +298,5 @@ int update(){
     }
 
 
-    float time = (float)glfwGetTime();
     return 0;
 }
