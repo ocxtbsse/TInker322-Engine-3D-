@@ -187,22 +187,22 @@ int init(){
 
 
 int render(){
-    glClearColor(0.1f, 0.1f, 0.4f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     prog.use();
 
     glUniform1i(glGetUniformLocation(prog.ID, "ourTexture"), 0); 
-    glm::vec3 lightPos(0.0f, 10.0f, 0.0f); 
+    glm::vec3 lightPos(0.0f, 100.0f, 0.0f); 
     prog.setVec3("lightPos", lightPos);
-    prog.setVec3("lightColor", glm::vec3(0.7f, 0.7f, 1.0f));
+    prog.setVec3("lightColor", glm::vec3(0.8f, 0.8f, 1.2f));
 
 
 
 
 
     for(auto& cams : sceneCamers){
-        prog.setMat4("view",cams.getCameraViewMatrix());
-        prog.setMat4("projection",cams.getCameraProjcetionMatrix());
+        prog.setMat4x4("view",cams.getCameraViewMat4x4());
+        prog.setMat4x4("projection",cams.getProectionMat4x4());
     }
 
 
@@ -214,10 +214,12 @@ int render(){
     
     
     for(auto& obj : sceneObjects){
-        glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
-        glBindVertexArray(obj.mesh.VAOTM);
-        prog.setMat4("model", obj.getModelMatrix());
-        glDrawElements(GL_TRIANGLES, obj.mesh.indicesSize, GL_UNSIGNED_INT, 0);
+        if(obj.visible){
+            glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
+            glBindVertexArray(obj.mesh.VAOTM);
+            prog.setMat4x4("model", obj.getModelMatrix4x4());
+            glDrawElements(GL_TRIANGLES, obj.mesh.indicesSize, GL_UNSIGNED_INT, 0);
+        }
     }
     
     
@@ -242,12 +244,23 @@ static double lastX = 800 / 2, lastY = 600 / 2;
 float yaw   = -90.0f; 
 float pitch = 0.0f;
 
+
+
+
+
+
+
+
+
+
+
+float velY = 0.0f;
+float gravity = 20.0f;
+
 int update(){
     Time::update();
-    GameObject& obj = sceneObjects[0];
-    GameObject& obj2 = sceneObjects[1];
-
-    Camera& camer = sceneCamers[0];
+    if (Time::deltaTime > 0.1f) Time::deltaTime = 0.1f;
+    Camera& cam = sceneCamers[0];
 
 
     glfwGetCursorPos(w1.window, &mouseX, &mouseY);
@@ -266,37 +279,60 @@ int update(){
 
 
 
-    glm::vec3 direction;
-    float cosPitch = cos(glm::radians(pitch));
-
-    direction.x = cos(glm::radians(yaw)) * cosPitch;
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cosPitch;
-
-        
-    camer.front = glm::normalize(direction);
+    VectorS direction;
+    float cosPitch = cos(pitch * DEGRAD);
 
 
 
-    glm::vec3 forward = glm::normalize(glm::vec3(camer.front.x, 0.0f, camer.front.z));
-    glm::vec3 right = glm::normalize(glm::cross(forward, camer.up));
+    
+
+    direction.vec3[X] = cos(yaw * DEGRAD) * cosPitch;
+    direction.vec3[Y] = sin(pitch * DEGRAD);
+
+    direction.vec3[Z] = sin(yaw * DEGRAD) * cosPitch;
+
+    cam.front.vec3[X] = direction.vec3[0];
+    cam.front.vec3[Y] = direction.vec3[1];
+    cam.front.vec3[Z] = direction.vec3[2];
+    cam.front.normalize();
+
+    VectorS forward;
+    forward.vec3[X] = cam.front.vec3[0];
+    forward.vec3[Y] = 0.0f;
+    forward.vec3[Z] = cam.front.vec3[2];
+    forward.normalize();
+
+
+
+    VectorS right;
+    right = forward.cross(cam.up);
+    right.normalize();
+
 
     float cameraSpeed = speed * Time::deltaTime;
 
+    if(glfwGetKey(w1.window, GLFW_KEY_W) == GLFW_PRESS){
+        cam.position.vec3[X] += forward.vec3[X] * cameraSpeed;
+        cam.position.vec3[Y] += forward.vec3[Y] * cameraSpeed;
+        cam.position.vec3[Z] += forward.vec3[Z] * cameraSpeed;
 
-    if (glfwGetKey(w1.window, GLFW_KEY_W) == GLFW_PRESS){
-        camer.position += forward * cameraSpeed;
     }
-    if (glfwGetKey(w1.window, GLFW_KEY_S) == GLFW_PRESS){
-        camer.position -= forward * cameraSpeed;
-    }
-    if (glfwGetKey(w1.window, GLFW_KEY_A) == GLFW_PRESS){
-        camer.position -= right * cameraSpeed;
-    }
-    if (glfwGetKey(w1.window, GLFW_KEY_D) == GLFW_PRESS){
-        camer.position += right * cameraSpeed;
+    if(glfwGetKey(w1.window, GLFW_KEY_S) == GLFW_PRESS){
+        cam.position.vec3[X] -= forward.vec3[X] * cameraSpeed;
+        cam.position.vec3[Y] -= forward.vec3[Y] * cameraSpeed;
+        cam.position.vec3[Z] -= forward.vec3[Z] * cameraSpeed;
     }
 
+     if(glfwGetKey(w1.window, GLFW_KEY_D) == GLFW_PRESS){
+        cam.position.vec3[X] += right.vec3[X] * cameraSpeed;
+        cam.position.vec3[Y] += right.vec3[Y] * cameraSpeed;
+        cam.position.vec3[Z] += right.vec3[Z] * cameraSpeed;
+    }
+    if(glfwGetKey(w1.window, GLFW_KEY_A) == GLFW_PRESS){
+        cam.position.vec3[X] -= right.vec3[X] * cameraSpeed;
+        cam.position.vec3[Y] -= right.vec3[Y] * cameraSpeed;
+        cam.position.vec3[Z] -= right.vec3[Z] * cameraSpeed;
+    }
 
     return 0;
 }
